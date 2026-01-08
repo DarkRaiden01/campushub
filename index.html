@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusHub - ERP Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login/Signup Page -->
+    <div id="authPage" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1>🏫 CampusHub</h1>..
+                <p class="tagline">Your Unified School Communication Platform</p>
+                
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="switchAuthTab('login')">Login</button>
+                    <button class="tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginForm" class="auth-form active">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button onclick="handleLogin()" class="btn-primary">Login</button>
+                </div>
+
+                <!-- Signup Form -->
+                <div id="signupForm" class="auth-form">
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                    <input type="password" id="signupPassword" placeholder="Password" required>
+                    <select id="signupRole" required>
+                        <option value="">Select Role</option>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="parent">Parent/Guardian</option>
+                        <option value="principal">Principal</option>
+                    </select>
+                    <input type="text" id="signupClass" placeholder="Class/Section">
+                    <button onclick="handleSignup()" class="btn-primary">Create Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardPage" class="page hidden">
+        <!-- Navigation Header -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <h2>🏫 CampusHub</h2>
+                <div class="theme-left">
+                    <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">☀️</button>
+                    <span id="themeState" class="theme-state">Light</span>
+                </div>
+            </div>
+            <div class="nav-center">
+                <button class="nav-btn active" onclick="switchPage('feed')">📰 Feed</button>
+                <button class="nav-btn" onclick="switchPage('calendar')">📅 Calendar</button>
+                <button class="nav-btn" onclick="switchPage('talent')">⭐ Talent Showcase</button>
+                <button class="nav-btn" onclick="switchPage('bazaar')">🎓 Bazaar</button>
+                <button class="nav-btn" onclick="switchPage('helpCenter')">❓ Help Center</button>
+                    <button class="nav-btn" onclick="switchPage('resources')">📚 Library&Lagecy</button>
+                <button class="nav-btn" onclick="switchPage('roleDashboard')">🏠 Dashboard</button>
+                <button class="nav-btn" onclick="switchPage('messages')">✉️ Messages</button>
+            </div>
+            <div class="nav-right">
+                <button id="notifToggleBtn" class="nav-btn notif-bell" onclick="toggleNotificationBar()" title="Notifications">🔔<span id="notifBadge" class="notif-badge" style="display:none">0</span></button>
+                <button id="assistantBtn" class="nav-btn" onclick="switchPage('assistant')" title="Study Assistant">🧠</button>
+                <button class="nav-btn" onclick="switchPage('profile')">👤 Profile</button>
+                <button class="btn-danger" onclick="handleLogout()">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Notification Bar -->
+        <div id="notificationBar" class="notification-bar">
+            <div class="notification-inner">
+                <div class="notification-header">
+                    <strong>Latest Notifications</strong>
+                    <div class="notification-actions">
+                        <button id="closeNotificationsBtn" class="btn-small btn-close" onclick="closeNotificationBar()" title="Close">✖</button>
+                        <button id="clearNotificationsBtn" class="btn-small" onclick="clearNotifications()">Clear</button>
+                    </div>
+                </div>
+                <div id="notificationList" class="notification-list">
+                    <div class="empty-state">No latest notifications</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rule-based Study Assistant Page -->
+        <div id="assistantPage" class="content-page hidden">
+            <div class="container">
+                <h2>🧠 Study Assistant</h2>
+                <div class="assistant-inner">
+                    <div class="assistant-header">
+                        <strong>Study Assistant</strong>
+                        <div class="assistant-actions">
+                            <button id="clearAssistantBtn" class="btn-small btn-clear" onclick="clearAssistantHistory()" title="Clear Chat">🧹</button>
+                            <button class="btn-small btn-close" onclick="switchPage('feed')" title="Close">✖</button>
+                        </div>
+                    </div>
+                    <div class="assistant-body">
+                        <div class="assistant-categories">
+                            <button class="assistant-cat" onclick="selectAssistantCategory('study')">Study Tips</button>
+                            <button class="assistant-cat" onclick="selectAssistantCategory('time')">Time Management</button>
+                            <button class="assistant-cat" onclick="selectAssistantCategory('math')">Math Formulas</button>
+                            <button class="assistant-cat" onclick="selectAssistantCategory('exam')">Exam Prep</button>
+                        </div>
+                        <div id="assistantHistory" class="assistant-history">
+                            <div class="empty-state">Ask me for tips or formulas</div>
+                        </div>
+                        <div class="assistant-input-row">
+                            <input id="assistantInput" type="text" placeholder="Ask (e.g., 'quadratic formula' or 'study tips for chemistry')">
+                            <button class="btn-primary-small" onclick="handleAssistantQuery()">Ask</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed Page -->
+        <div id="feedPage" class="content-page active">
+            <div class="container">
+                <h2>📰 School Feed</h2>
+                
+                <!-- Post Creator -->
+                <div class="post-creator">
+                    <div class="creator-header">
+                        <img id="creatorProfileImg" src="https://via.placeholder.com/40" alt="Profile" class="profile-img-small">
+                        <input type="text" id="postInput" placeholder="What's on your mind?" class="post-input">
+                    </div>
+                    <div class="creator-actions">
+                        <select id="postCategory" class="category-select">
+                            <option value="">Select Category</option>
+                            <option value="Sports">#Sports</option>
+                            <option value="Academics">#Academics</option>
+                            <option value="Art">#Art</option>
+                            <option value="Fest">#Fest</option>
+                            <option value="General">#General</option>
+                        </select>
+                        <input type="file" id="postImage" accept="image/*" style="display: none;">
+                        <button onclick="document.getElementById('postImage').click()" class="btn-small">📷 Photo</button>
+                        <button onclick="createPost()" class="btn-primary-small">Post</button>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="feedContainer" class="feed-container">
+                    <!-- Posts will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Page -->
+        <div id="resourcesPage" class="content-page hidden">
+            <div class="container">
+                <h2>📚 Library&Lagecy - Notes & Cheat Sheets</h2>
+                <div class="resource-upload">
+                    <h3>Add to Library&Lagecy</h3>
+                    <p class="small-muted">Students: upload Notes. Teachers: upload Cheat Sheets / Worksheets.</p>
+                    <input type="text" id="resTitle" placeholder="Title">
+                    <input type="text" id="resSubject" placeholder="Subject (e.g., Math)">
+                    <select id="resType">
+                        <option value="Note">Note</option>
+                        <option value="CheatSheet">Cheat Sheet</option>
+                        <option value="Worksheet">Worksheet</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="file" id="resFile" accept="application/pdf,image/*,.doc,.docx,.ppt,.pptx">
+                    <textarea id="resDesc" rows="3" placeholder="Short description (optional)"></textarea>
+                    <button class="btn-primary" onclick="uploadResource()">Upload</button>
+                </div>
+
+                <div class="resources-list">
+                    <h3>Library&Lagecy Collection</h3>
+                    <div id="resourcesContainer" class="resources-container">
+                        <!-- resources will render here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Page -->
+        <div id="calendarPage" class="content-page hidden">
+            <div class="container">
+                <h2>📅 Master Calendar</h2>
+                
+                <!-- Calendar Controls -->
+                <div class="calendar-controls">
+                    <button onclick="previousMonth()">&lt; Previous</button>
+                    <h3 id="monthYear"></h3>
+                    <button onclick="nextMonth()">Next &gt;</button>
+                </div>
+
+                <!-- Event Creator (Teacher/Admin only) -->
+                <div id="eventCreator" class="event-creator hidden">
+                    <h3>Add Event</h3>
+                    <input type="date" id="eventDate" required>
+                    <input type="text" id="eventTitle" placeholder="Event Title" required>
+                    <input type="text" id="eventDescription" placeholder="Description" required>
+                    <select id="eventType" required>
+                        <option value="">Select Event Type</option>
+                        <option value="Exam">🔴 Exam/Test</option>
+                        <option value="Holiday">🟢 Holiday/Festival</option>
+                        <option value="Sports">🔵 Sports/Cultural</option>
+                    </select>
+                    <button onclick="addEvent()" class="btn-primary">Add Event</button>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="calendar-container">
+                    <div class="weekdays">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid">
+                        <!-- Calendar dates will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Events List -->
+                <div class="events-list">
+                    <h3>Upcoming Events</h3>
+                    <div id="eventsList" class="events-container">
+                        <!-- Events will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Talent Showcase Page -->
+        <div id="talentPage" class="content-page hidden">
+            <div class="container">
+                <h2>⭐ Talent Showcase</h2>
+                
+                <!-- Talent Upload -->
+                <div class="talent-upload">
+                    <h3>Share Your Talent</h3>
+                    <input type="text" id="talentTitle" placeholder="Talent Title (e.g., 'Painting', 'Music')" required>
+                    <textarea id="talentDescription" placeholder="Describe your talent..." rows="3" required></textarea>
+                    <select id="talentCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Art">🎨 Art & Design</option>
+                        <option value="Music">🎵 Music</option>
+                        <option value="Sports">⚽ Sports</option>
+                        <option value="Dance">💃 Dance</option>
+                        <option value="Technology">💻 Technology</option>
+                        <option value="Photography">📸 Photography</option>
+                        <option value="Other">✨ Other</option>
+                    </select>
+                    <input type="file" id="talentFile" accept="image/*,video/*" required>
+                    <button onclick="uploadTalent()" class="btn-primary">Upload Talent</button>
+                </div>
+
+                <!-- Talents Gallery -->
+                <div class="talents-gallery">
+                    <h3>Student Talents</h3>
+                    <div id="talentsContainer" class="talents-grid">
+                        <!-- Talents will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bazaar Page -->
+        <div id="bazaarPage" class="content-page hidden">
+            <div class="container">
+                <h2>🎓 Skill-Swap Bazaar</h2>
+                <div class="bazaar-controls">
+                    <div class="toggle-group">
+                        <button id="bazaarTeachingBtn" class="btn-small" onclick="setBazaarType('Offering')">People Teaching</button>
+                        <button id="bazaarLearningBtn" class="btn-small" onclick="setBazaarType('Requesting')">People Learning</button>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center">
+                        <div class="bazaar-info small-muted">Connect with peers to teach or request skills — earn points for trading knowledge.</div>
+                        <button class="btn-small" onclick="openCreateSkillModal()">➕ Create Skill Post</button>
+                        <button class="btn-small" onclick="seedLocalBazaar()">⚡ Seed Demo</button>
+                    </div>
+                </div>
+
+                <div id="bazaarList" class="bazaar-grid">
+                    <!-- Tutor cards rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Center Page -->
+        <div id="helpCenterPage" class="content-page hidden">
+            <div class="container">
+                <h2>❓ Help Center - Q&A Forum</h2>
+                
+                <!-- Question Submission -->
+                <div class="question-creator">
+                    <h3>Ask a Question</h3>
+                    <input type="text" id="questionTitle" placeholder="Your Question" required>
+                    <textarea id="questionDescription" placeholder="Provide more details..." rows="4" required></textarea>
+                    <select id="questionCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Academics">📚 Academics</option>
+                        <option value="Administrative">📋 Administrative</option>
+                        <option value="Technical">💻 Technical</option>
+                        <option value="General">💬 General</option>
+                    </select>
+                    <button onclick="postQuestion()" class="btn-primary">Post Question</button>
+                </div>
+
+                <!-- Questions List -->
+                <div class="questions-list">
+                    <h3>Recent Questions</h3>
+                    <div id="questionsContainer" class="questions-container">
+                        <!-- Questions will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role-specific Dashboard Page (renders per role) -->
+        <div id="roleDashboardPage" class="content-page hidden">
+            <div class="container">
+                <h2>🏠 Role Dashboard</h2>
+                <div id="roleDashboardContainer">
+                    <!-- JS will render Principal / Teacher / Student / Parent dashboards here -->
+                </div>
+                <!-- Teacher alerts (populated when teacher dashboard is active) -->
+                <div id="teacherAlertsList" class="teacher-alerts"></div>
+                
+            </div>
+        </div>
+
+        <!-- Messages Page -->
+        <div id="messagesPage" class="content-page hidden">
+            <div class="container">
+                <h2>✉️ Internal Messaging</h2>
+
+                <div class="messages-layout">
+                    <div class="messages-compose">
+                        <h3>Send Message</h3>
+                        <input type="text" id="msgReceiverName" placeholder="Receiver Full Name">
+                        <input type="text" id="msgClass" placeholder="Class (optional)">
+                        <input type="text" id="msgRoll" placeholder="Roll Number (optional)">
+                        <textarea id="msgText" rows="4" placeholder="Write your message..."></textarea>
+                        <button onclick="sendMessageFromUI()" class="btn-primary">Send</button>
+                    </div>
+
+                    <div class="messages-inbox">
+                        <h3>Inbox</h3>
+                        <div id="inboxList" class="inbox-list">
+                            <!-- Messages listed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="content-page hidden">
+            <div class="container">
+                <h2>👤 My Profile</h2>
+                
+                <div class="profile-container">
+                    <div class="profile-section">
+                        <div class="profile-header">
+                            <img id="profilePicture" src="https://via.placeholder.com/150" alt="Profile" class="profile-img-large">
+                            <button onclick="changeProfilePicture()" class="btn-small">Change Photo</button>
+                            <input type="file" id="profilePictureInput" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div class="profile-info">
+                            <h3 id="profileName"></h3>
+                            <p id="profileRole"></p>
+                            <p id="profileClass"></p>
+                        </div>
+                            <!-- Silent Alerts for student (private guidance) -->
+                            <div id="silentAlertsStudent" class="silent-alerts" aria-live="polite"></div>
+                    </div>
+
+                    <div class="profile-edit">
+                        <h3>Edit Profile</h3>
+                        <input type="text" id="editName" placeholder="Full Name" required>
+                        <input type="text" id="editClass" placeholder="Class/Section" required>
+                        <textarea id="editBio" placeholder="Bio (150 characters)" rows="3" maxlength="150"></textarea>
+                        <button onclick="saveProfile()" class="btn-primary">Save Changes</button>
+                    </div>
+
+                    <div class="profile-stats">
+                        <h3>Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <p class="stat-number" id="postCount">0</p>
+                                <p class="stat-label">Posts</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-number" id="talentCount">0</p>
+                                <p class="stat-label">Talents</p>
+                            </div>
+                            <div class="stat-card">
+                                <p class="stat-number" id="questionCount">0</p>
+                                <p class="stat-label">Questions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Silent Alert Pin (always visible) -->
+    <div id="silentAlertPin" class="silent-alert-pin" onclick="toggleSilentAlertDrawer()" title="Private Guidance">📌</div>
+
+    <!-- Silent Alert Drawer -->
+    <div id="silentAlertDrawer" class="silent-alert-drawer hidden" aria-hidden="true">
+        <div class="silent-alert-drawer-inner">
+            <div class="silent-alert-drawer-header">
+                <strong>Private Guidance</strong>
+                <button class="btn-small" onclick="closeSilentAlertDrawer()">✖</button>
+            </div>
+            <div id="silentAlertDrawerList" class="silent-alerts">
+                <!-- Drawer populated by JS -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>
